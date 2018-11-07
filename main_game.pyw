@@ -117,10 +117,6 @@ def load_bird_image(flight_position,paused,angle_deviation):
 	else:
 		bolt.body = pygame.image.load('bluebird-midflap.png')
 
-quit_game = False
-
-start_time = 0
-
 def teaser(game_window,game_clock):
 	global bolt, base_x, base_y
 	start = False
@@ -260,7 +256,9 @@ def game_loop(game_window,game_clock,quit_game,debugging=debugger):
 
 def main():
 	pygame.init()
-	teaser(game_window,game_clock,)
+	teaser(game_window,game_clock)
+	quit_game = False
+	start_time = 0
 	game_loop(game_window,game_clock,quit_game)
 	writer()			# making a copy of the original scores.
 	pygame.quit()

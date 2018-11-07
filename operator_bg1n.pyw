@@ -29,13 +29,9 @@ class welcome_screen():
 		me.showYstuff.config(text=f'the button has been clicked {me.button_click} times')
 		me.showYstuff.pack()
 
-	def play_command(self):
-		self.button_click += 1
-		self.showYstuff.config(text=f'the button has been clicked {self.button_click} times')
-		return self.button_click
-
 	def open_game(self):
 		system(r'.\main_game.pyw')
+		self.button_click += 1
 
 def main():
 	obx = welcome_screen()
