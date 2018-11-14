@@ -1,0 +1,9 @@
+.LOG
+Creation of this log file
+19:16 08-11-2018
+
+19:17 08-11-2018
+Today, I edited the requirements
+
+17:38 12-11-2018
+Today, I shifted the python files to another folder so that they will be hidden

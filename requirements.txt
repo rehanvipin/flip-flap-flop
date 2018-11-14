@@ -1,5 +1,0 @@
-pygame==1.9.4
-time
-re
-hashlib
-tkinter==

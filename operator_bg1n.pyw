@@ -26,18 +26,17 @@ class welcome_screen():
 		me.datainfo = tk.Frame(me.main_window)
 		me.datainfo.pack(fill= tk.BOTH)
 		me.showYstuff = tk.Label(me.datainfo, background= 'red')
-		me.showYstuff.config(text=f'the button has been clicked {me.button_click} times')
+		me.showYstuff.config(text='press p to pause the game')
 		me.showYstuff.pack()
+		me.on = False
 
 	def open_game(self):
-		system(r'.\main_game.pyw')
-		self.button_click += 1
+		system(r'python main_game.pyw')
+		
 
-def main():
+def loginScr():
 	obx = welcome_screen()
 	tk.mainloop()
-	times = obx.play_command()
-	# print(argv[1:])
 
 if __name__ == '__main__':
-	main()
+	loginScr()
