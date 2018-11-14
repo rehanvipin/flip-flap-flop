@@ -24,11 +24,16 @@ class welcome_screen():
 		me.button_click = 0
 
 		me.datainfo = tk.Frame(me.main_window)
-		me.datainfo.pack(fill= tk.BOTH)
-		me.showYstuff = tk.Label(me.datainfo, background= 'red')
-		me.showYstuff.config(text='press p to pause the game')
+		me.datainfo.pack(expand = 1)
+		me.showYstuff = tk.Label(me.datainfo, background= '#f00ff0', font = ('Helvetica',14))
+		me.showYstuff.config(text='Press x to pause the game', pady = 3)
+		me.showscore = tk.Label(me.datainfo, background = "Blue", font = "ComicSansms", pady = 3)
+
+		with open('.\\Database\\scores.LOG','r') as tops:
+			me.showscore.config(text = "highscore  " + tops.readlines()[-1])
+
+		me.showscore.pack(fill = tk.Y)
 		me.showYstuff.pack()
-		me.on = False
 
 	def open_game(self):
 		system(r'python main_game.pyw')

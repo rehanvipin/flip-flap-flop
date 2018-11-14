@@ -5,8 +5,7 @@ __version__ = "0.7 --beta"
 __author__ = "Ice Cold Articuno"
 
 import pygame
-from objects import bird
-from objects import pipes
+from objects import bird, pipes, ground
 from time import sleep,time
 from Database.verifier import opyt, writer
 from operator_bg1n import loginScr
@@ -27,10 +26,11 @@ restart_screen = False 					# change this to True to get a nicer restart screen
 
 bolt.body = pygame.image.load('.\\Assets\\bluebird-midflap.png')
 background = pygame.image.load('.\\Assets\\backgroundimg.png')
-base = pygame.image.load('.\\Assets\\base.png')
 game_over_pic = pygame.image.load('.\\Assets\\gameover.png')
-
 score_sprites = [pygame.image.load(f'.\\Assets\\{i}.png') for i in range(10)]
+
+base = ground.Base(pygame.image.load('.\\Assets\\base.png'),base_x, base_y)
+
 
 lower_pipes_30 = [pipes.Pipes(pygame.image.load('.\\Assets\\pipe-green.png'),200,0,0) for i in range(no_of_pipes)]	# for the lower pipes
 upper_pipes_30 = [pipes.Pipes(pygame.image.load('.\\Assets\\pipe-green_up.png'),200,0,0) for i in range(no_of_pipes)]
@@ -62,8 +62,8 @@ def text_objects(text, font, text_color): #displays the font with the text with 
 	text_surface = font.render(text, True, colors[text_color])
 	return text_surface, text_surface.get_rect()
 
-def text_display(text,rect_centre, text_color):
-	crash_text = pygame.font.Font('freesansbold.ttf',40) 
+def text_display(text,rect_centre, text_color, font_size):
+	crash_text = pygame.font.Font('freesansbold.ttf',font_size) 
 	text_surface, Text_rectangle = text_objects(text, crash_text, text_color) 
 	Text_rectangle.center = (rect_centre) 
 	game_window.blit(text_surface, Text_rectangle) 
@@ -87,19 +87,20 @@ def game_over(score,restart_screen):
 	write_scores(score)					# to write the user's score to the file
 	sort_scores()						# to sort the hishscores
 	top_score = make_user_feel_bad()	# to get the highscore
-	text_display('Highscore : ' + top_score,((screen_width/2),screen_height/20),'black')
+	text_display('Highscore : ' + top_score,((screen_width/2),screen_height/20),'black',28)
 	op_centre = (screen_width/2,screen_height/3.2)
 	op = "game restarts in 3"
 
 	for i in range(3):
-		text_display(op,op_centre,'blue')
+		text_display(op,op_centre,'blue',30)
 		pygame.display.update()
 		sleep(1)
 		op = str(2-i)
-		op_centre = ((screen_width/2 + 40*(1+i) + 168),screen_height/3.2)
+		op_centre = ((screen_width/2 + 40*(1+i) + 125),screen_height/3.2)
 
 	#teaser(game_window,game_clock)		# I don't like this for some reason, maybe a better 'between game' screen could fix this
 	bolt.y = initial_position[1]
+
 	if restart_screen:
 		teaser(game_window,game_clock)
 
@@ -120,7 +121,7 @@ def load_bird_image(flight_position,paused,angle_deviation):
 		bolt.body = pygame.image.load('.\\Assets\\bluebird-midflap.png')
 
 def teaser(game_window,game_clock):
-	global bolt, base_x, base_y
+	global bolt, base
 	start = False
 	while not start:
 		for event in pygame.event.get():
@@ -130,24 +131,25 @@ def teaser(game_window,game_clock):
 			elif event.type == pygame.QUIT:
 				pygame.quit()
 			continue
-		base_x -= 4
+		base.move(-4)
 
-		if base_x < -100:
-			base_x = 0
+		if base.x < -100:
+			base.move(pos=0)
+
 		game_window.blit(background,(0,0))
-		game_window.blit(base,(base_x,base_y))
+		game_window.blit(base.body,(base.x,base.y))
 		load_bird_image(-1,False,0)
 		game_window.blit(bolt.body,(bolt.x,bolt.y))	
-		text_display('PRESS SPACE TO START THE GAME',(screen_width/2,screen_height/3.2),'black')
+		text_display('PRESS SPACE TO START THE GAME',(screen_width/2,screen_height/3.2),'black',40)
 		pygame.display.update()
 		game_clock.tick(frames_per_second)
 
 def game_loop(game_window,game_clock,quit_game,debugging=debugger):
-	global bolt, base_x, base_y, between, start_time, base_speed, background, angle_deviation
+	global bolt, base, between, background, angle_deviation
 
 	score = 0
 	start_time = time()
-	y_change = 3
+	bolt.speed = 3
 	pipe_speed = 3
 	angle_deviation = 0
 	background_toggle = True
@@ -155,12 +157,12 @@ def game_loop(game_window,game_clock,quit_game,debugging=debugger):
 	crash = False
 
 	while not quit_game:
-		if y_change  > 0:						# animation for the bird movement
-			y_change = ((y_change)**2 + gravity_factor)**0.5
-		elif y_change == 0:
-			y_change = 0
+		if bolt.speed  > 0:						# animation for the bird movement
+			bolt.speed = ((bolt.speed)**2 + gravity_factor)**0.5
+		elif bolt.speed == 0:
+			bolt.speed = 0
 		else:
-			y_change = -((y_change)**2 + springiness)**0.5		# yeah, really! it do be like that
+			bolt.speed = -((bolt.speed)**2 + springiness)**0.5		# yeah, really! it do be like that
 
 		if not crash:
 			for event in pygame.event.get():
@@ -168,12 +170,12 @@ def game_loop(game_window,game_clock,quit_game,debugging=debugger):
 					quit_game = True
 				if event.type == pygame.KEYDOWN:
 					if event.key == pygame.K_UP:
-						y_change = -4
+						bolt.speed = -4
 						angle_deviation += 15 
 					elif event.key == pygame.K_SPACE:
-						y_change = -4
+						bolt.speed = -4
 						angle_deviation += 15
-					if event.key == pygame.K_p:
+					if event.key == pygame.K_x:
 						pause = True
 					if event.key == pygame.K_SPACE:
 						pause = False
@@ -181,35 +183,35 @@ def game_loop(game_window,game_clock,quit_game,debugging=debugger):
 					angle_deviation -= 13
 					if angle_deviation > 20:
 						angle_deviation = 10
-					y_change = 3				# just an optimal value to simulate gravity
+					bolt.speed = 3				# just an optimal value to simulate gravity
 
 		if bolt.y < 0:			# to make the bird bounce off the top of the screen, just in case...
 			bolt.y == 0
-			y_change = 5
+			bolt.speed = 5
 
 		if pause:				# this is for when the game is paused
-			y_change = 0
-			base_speed = 0
+			bolt.speed = 0
+			base.speed = 0
 			pipe_speed = 0
 		elif not crash:			# don't remove this, it will cause the pipe_objects to stop moving
-			base_speed = 3
+			base.speed = 3
 			pipe_speed = 4
 
-		if crash and (bolt.y + bolt.height) < base_y:	# when crashed
-			y_change = 3
+		if crash and (bolt.y + bolt.height) < base.y:	# when crashed
+			bolt.speed = 3
 			if angle_deviation > -90:
 				angle_deviation -= 1.2
-			base_speed = 0
+			base.speed = 0
 			pipe_speed = 0
 
-		if (bolt.y + bolt.height) == base_y:			# to quit the game when the bird has fallen down
+		if (bolt.y + bolt.height) == base.y:			# to quit the game when the bird has fallen down
 			quit_game = True
 			game_over(score,restart_screen)
 
-		base_x = base_x - base_speed
+		base.move(-1*base.speed)
 
-		if base_x < -100:
-			base_x = 0
+		if base.x < -100:
+			base.move(pos=0)
 
 		if not pause:
 			for i in range(len(lower_pipes_30)):
@@ -222,8 +224,6 @@ def game_loop(game_window,game_clock,quit_game,debugging=debugger):
 					else:
 						if not debugging :		
 							crash = True
-						else:
-							pass
 			if score%25 ==0 and score != 0:			# this is the code for the night mode
 				if background_toggle:
 					background = pygame.image.load('.\\Assets\\background-night.png')
@@ -232,7 +232,7 @@ def game_loop(game_window,game_clock,quit_game,debugging=debugger):
 				background_toggle = not background_toggle
 				score += 1
 		else:
-			text_display('PRESS SPACE TO CONTINUE',(screen_width/2,screen_height/3.2),'red') 					
+			text_display('PRESS SPACE TO CONTINUE',(screen_width/2,screen_height/3.2),'red',40) 					
 
 		for i in range(len(lower_pipes_30)):
 			if lower_pipes_30[no_of_pipes-1].x < 0:				# to make the game harder as it progresses
@@ -248,7 +248,7 @@ def game_loop(game_window,game_clock,quit_game,debugging=debugger):
 				upper_pipes_30[i].x = pipes_start_pos[i]
 				upper_pipes_30[i].y = -200 - between + lower_heights[i]
 		
-		bolt.y = bolt.y + y_change # to move the bird up and down
+		bolt.y = bolt.y + bolt.speed # to move the bird up and down
 		if bolt.y+bolt.height > 420:				# bird with ground crash logic
 			bolt.y = screen_height*0.5
 			game_over(score,restart_screen)
@@ -258,7 +258,8 @@ def game_loop(game_window,game_clock,quit_game,debugging=debugger):
 		flaps_time = start_time-time()
 		flaps_time = int(flaps_time)-flaps_time
 		load_bird_image(flaps_time,pause,angle_deviation)					# to make the bird flap(beta)
-		game_window.blit(bolt.body,(bolt.x,bolt.y))			# to display the bird
+		if not crash:
+			game_window.blit(bolt.body,(bolt.x,bolt.y))			# to display the bird
 
 		for i in lower_pipes_30:
 			game_window.blit(i.body,(i.x,i.y))		# to draw the pipes
@@ -266,7 +267,10 @@ def game_loop(game_window,game_clock,quit_game,debugging=debugger):
 		for i in upper_pipes_30:
 			game_window.blit(i.body,(i.x,i.y))		# to draw the upper pipes
 
-		game_window.blit(base,(base_x,base_y))		# to draw the base
+		game_window.blit(base.body,(base.x,base.y))		# to draw the base
+
+		if crash:
+			game_window.blit(bolt.body,(bolt.x,bolt.y))
 
 		display_score(score,game_window,score_sprites)
 
