@@ -1,17 +1,16 @@
-#! /usr/bin/env python3
 
 __doc__ = """ An advance spin off of a popular mobile game. """
-__version__ = "0.7 --beta"
+__version__ = "1.0"
 __author__ = "Ice Cold Articuno"
 
+from sys import argv
+
 import pygame
+
 from objects import bird, pipes, ground
 from time import sleep,time
 from Database.verifier import opyt, writer
-from operator_bg1n import loginScr
 from game_constants import *
-
-#operator_bg1n.main()
 
 pygame.init()
 
@@ -21,7 +20,10 @@ game_window = pygame.display.set_mode((screen_width,screen_height))
 pygame.display.set_caption("Flip Flap")
 game_clock = pygame.time.Clock()
 
-debugger = False						# change this to True whenever you need to debug
+if argv[-1] == "admin":
+	debugger = True					# change this to True whenever you need to debug
+else:
+	debugger = False
 restart_screen = False 					# change this to True to get a nicer restart screen
 
 bolt.body = pygame.image.load('.\\Assets\\bluebird-midflap.png')
@@ -84,7 +86,8 @@ def game_over(score,restart_screen):
 	#text_display('restart the game')
 	game_window.blit(game_over_pic,((screen_width/2.6),screen_height/2.4))
 	make_pipes()						# to make the pipes again
-	write_scores(score)					# to write the user's score to the file
+	if (argv[-1] != "admin"):
+		write_scores(score, name =argv[1])					# to write the user's score to the file
 	sort_scores()						# to sort the hishscores
 	top_score = make_user_feel_bad()	# to get the highscore
 	text_display('Highscore : ' + top_score,((screen_width/2),screen_height/20),'black',28)
@@ -175,9 +178,12 @@ def game_loop(game_window,game_clock,quit_game,debugging=debugger):
 					elif event.key == pygame.K_SPACE:
 						bolt.speed = -4
 						angle_deviation += 15
-					if event.key == pygame.K_x:
+					elif event.key == pygame.K_w:
+						bolt.speed = -4
+						angle_deviation += 15
+					elif event.key == pygame.K_x:
 						pause = True
-					if event.key == pygame.K_SPACE:
+					elif event.key == pygame.K_SPACE:
 						pause = False
 				if event.type == pygame.KEYUP and not pause:
 					angle_deviation -= 13
@@ -282,6 +288,10 @@ def game_loop(game_window,game_clock,quit_game,debugging=debugger):
 def main():
 	pygame.init()
 	teaser(game_window,game_clock)
+	if argv[-1] == "admin":
+		debugger = True
+	else:
+		debugger = False
 	quit_game = False
 	start_time = 0
 	game_loop(game_window,game_clock,quit_game)
@@ -289,5 +299,5 @@ def main():
 	pygame.quit()
 
 if __name__ == '__main__':
+	argv.append(['loser'])
 	main()
-

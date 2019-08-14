@@ -34,7 +34,7 @@ def sort_scores():
 		random_buffer = list(filler)
 	random_buffer = list(filter(lambda x : not x.isspace(),random_buffer))
 	random_buffer = list(map(lambda x:x.rstrip('\n').lstrip('\n'),random_buffer))
-	random_buffer = sorted(random_buffer,key = lambda x:int(witchcraft.search('\d+',x).group()))
+	random_buffer = sorted(random_buffer,key = lambda x:int(x.split("'s score: ")[1]))
 	random_buffer = random_buffer[:1] + list(filter(lambda x: int(x[-1]),random_buffer))
 
 	with open('.\\Database\\scores.LOG','w') as wiper:
@@ -44,9 +44,11 @@ def sort_scores():
 
 	with open('.\\Database\\hiscor','w') as tops:
 		high_score = random_buffer[-1]
-		high_score = witchcraft.search(r'\d+',high_score).group()
+		high_score = high_score.split("'s score: ")[1]
 		tops.write(high_score)
 
 def make_user_feel_bad():
 	with open('.\\Database\\hiscor','r') as drugs:
 		return drugs.read()
+
+sort_scores()

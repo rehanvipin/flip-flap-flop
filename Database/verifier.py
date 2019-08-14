@@ -53,4 +53,4 @@ def writer():
 	with open('.\\Database\\anti cheat','w') as writes:
 		writes.write(buffe)
 
-#bbb25149ca58f6dbe1395590fe91f227ad5696cda0d262eeee73bc59d2a62c08
+#c60f8c2a94d64160479829a5db5b1bf0b3f05e08fca1fdd7526927bef13f44a0
