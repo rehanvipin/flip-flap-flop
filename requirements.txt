@@ -1,2 +1,2 @@
 pygame==1.9.4
-pillow==7.1.0
+pillow==8.1.1
